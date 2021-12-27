@@ -2,23 +2,32 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-class Square extends React.Component {
-  // This is a "Controlled Component" since Board has full control over these.
-  render() {
-    // Use the prop passed from the parent Board component, and return its value.
-    return (
-      <button
-        className="square"
-        onClick={() => {
-          // When a Square is clicked, the onClick function provided by Board is called.
-          this.props.onClick();
-        }}
-      >
-        {this.props.value}
-      </button>
-    );
-  }
-}
+// class Square extends React.Component {
+//   // This is a "Controlled Component" since Board has full control over these.
+//   render() {
+//     // Use the prop passed from the parent Board component, and return its value.
+//     return (
+//       <button
+//         className="square"
+//         onClick={() => {
+//           // When a Square is clicked, the onClick function provided by Board is called.
+//           this.props.onClick();
+//         }}
+//       >
+//         {this.props.value}
+//       </button>
+//     );
+//   }
+// }
+
+// Turning the Square component into a Function Component
+const Square = (props) => {
+  return (
+    <button className="square" onClick={props.onClick}>
+      {props.value}
+    </button>
+  );
+};
 
 class Board extends React.Component {
   /**
@@ -28,14 +37,23 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      // Create a "board" of 9 empty spaces.
       squares: Array(9).fill(null),
+      // If xIsNext is true, change the square's value to be "X", otherwise "O"
+      xIsNext: true,
     };
   }
 
   handleClick(i) {
+    // Create a copy of the array, instead of modifying the existing one to fit immutability paradigm.
     const squares = this.state.squares.slice();
-    squares[i] = "X";
-    this.setState({ squares: squares });
+    // Making use of a ternary operator, we check if X is next, and return "X" if true, and "O" if it's false.
+    squares[i] = this.state.xIsNext ? "X" : "O";
+    this.setState({
+      squares: squares,
+      // Flip the value of xIsNext (If true, then make it false. If false, make it true.)
+      xIsNext: !this.state.xIsNext,
+    });
   }
 
   renderSquare(i) {
@@ -65,7 +83,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = "Next player: X";
+    const status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
 
     return (
       <div>
