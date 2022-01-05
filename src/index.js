@@ -47,6 +47,10 @@ class Board extends React.Component {
   handleClick(i) {
     // Create a copy of the array, instead of modifying the existing one to fit immutability paradigm.
     const squares = this.state.squares.slice();
+    //If there is a winner, we can just break out of the function since we don't want to continue to play after someone already won.
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
     // Making use of a ternary operator, we check if X is next, and return "X" if true, and "O" if it's false.
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
@@ -83,7 +87,16 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
+    // Make use of a template literal, and a ternary operator to change the status text depending on the next player
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    // If our calculateWinner function returns true, change the status to equal "Winner: (plus the winning letter)"
+    if (winner) {
+      status = "Winner: " + winner;
+      // Otherwise, change status to show who the next player is.
+    } else {
+      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+    }
 
     return (
       <div>
@@ -122,6 +135,27 @@ class Game extends React.Component {
       </div>
     );
   }
+}
+
+// Given an array of 9 squares, this function will check for a winner and return 'X', 'O', or null as appropriate.
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
 }
 
 // ========================================
